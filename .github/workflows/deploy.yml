@@ -5,6 +5,10 @@ on:
     branches: [ master ]      # 你 push 到 master 就會自動部署
   workflow_dispatch:          # 也可手動按下去跑
 
+# ★ 必加：讓 GITHUB_TOKEN 具有 push 權限
+permissions:
+  contents: write
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
