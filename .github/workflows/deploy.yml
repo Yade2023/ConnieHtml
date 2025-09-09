@@ -1,21 +1,12 @@
-name: Deploy Vite (connie-frontend) to GitHub Pages
+name: Deploy to gh-pages (connie-frontend)
 
 on:
   push:
-    branches: [ master ]     # 推到 master 自動部署
-  workflow_dispatch:         # 也可手動觸發
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches: [ master ]      # 你 push 到 master 就會自動部署
+  workflow_dispatch:          # 也可手動按下去跑
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,25 +19,27 @@ jobs:
 
       - name: Install deps
         working-directory: connie-frontend
-        run: npm ci
-        # 如果沒有 package-lock.json，改成 npm install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-      - name: Build (set base to /ConnieHtml/)
+      # 重要：設定 base=/ConnieHtml/ 讓靜態資源走子路徑
+      - name: Build (base = /ConnieHtml/)
         working-directory: connie-frontend
-        run: npm run build -- --base=/ConnieHtml/
-        # 這會讓靜態資源路徑帶上 /ConnieHtml/，避免 CSS/圖檔 404
+        run: |
+          if npm run | grep -q "build"; then \
+            npm run build -- --base=/ConnieHtml/; \
+          else \
+            npx vite build --base=/ConnieHtml/; \
+          fi
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      # 避免前端路由刷新 404
+      - name: Create 404.html
+        run: cp connie-frontend/dist/index.html connie-frontend/dist/404.html
+
+      # 發佈到 gh-pages 分支
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: connie-frontend/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: connie-frontend/dist
+          publish_branch: gh-pages
