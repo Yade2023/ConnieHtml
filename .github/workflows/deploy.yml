@@ -1,0 +1,52 @@
+name: Deploy Vite (connie-frontend) to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]     # 推到 master 自動部署
+  workflow_dispatch:         # 也可手動觸發
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: connie-frontend/package-lock.json
+
+      - name: Install deps
+        working-directory: connie-frontend
+        run: npm ci
+        # 如果沒有 package-lock.json，改成 npm install
+
+      - name: Build (set base to /ConnieHtml/)
+        working-directory: connie-frontend
+        run: npm run build -- --base=/ConnieHtml/
+        # 這會讓靜態資源路徑帶上 /ConnieHtml/，避免 CSS/圖檔 404
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: connie-frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
