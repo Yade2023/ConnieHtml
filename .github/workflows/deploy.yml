@@ -1,0 +1,49 @@
+name: Deploy to gh-pages (connie-frontend)
+
+on:
+  push:
+    branches: [ master ]      # 你 push 到 master 就會自動部署
+  workflow_dispatch:          # 也可手動按下去跑
+
+# ★ 必加：讓 GITHUB_TOKEN 具有 push 權限
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: connie-frontend/package-lock.json
+
+      - name: Install deps
+        working-directory: connie-frontend
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      # 重要：設定 base=/ConnieHtml/ 讓靜態資源走子路徑
+      - name: Build (base = /ConnieHtml/)
+        working-directory: connie-frontend
+        run: |
+          if npm run | grep -q "build"; then \
+            npm run build -- --base=/ConnieHtml/; \
+          else \
+            npx vite build --base=/ConnieHtml/; \
+          fi
+
+      # 避免前端路由刷新 404
+      - name: Create 404.html
+        run: cp connie-frontend/dist/index.html connie-frontend/dist/404.html
+
+      # 發佈到 gh-pages 分支
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: connie-frontend/dist
+          publish_branch: gh-pages
