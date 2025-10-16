@@ -1,13 +1,22 @@
 <template>
   <footer class="site-footer">
     <div class="footer-content">
-      <a class="footer-link" href="/" target="_self">康妮泌乳美學 首頁</a>
+      <a class="footer-link" href="/" target="_self">© 2025  康妮泌乳美學.版權所有</a>
       <span class="footer-divider">|</span>
       <span class="footer-counter">瀏覽人次：{{ viewCount }}</span>
+    </div>
+    <div>
+      <span class="footer-keywords">康妮泌乳美學/桃園泌乳/新北泌乳/孕婦按摩/產後修護/桃園新北紮肚/腹直肌復位紮肚/到府泌乳師/到府產康師 </span>
     </div>
   </footer>
 </template>
 
+<style>
+.footer-keywords {
+  font-size: 8px;
+
+}
+</style>
 <script setup>
 import { ref, onMounted } from 'vue';
 

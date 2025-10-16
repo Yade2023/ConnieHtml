@@ -6,7 +6,7 @@ body, #app {
 }
 .navbar {
   display: flex;
-  align-items: center;
+  align-items:self-start;
   justify-content: space-between;
   background: #fff;
   padding: 0.5rem 2rem;

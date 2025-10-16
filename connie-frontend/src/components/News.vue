@@ -12,11 +12,12 @@
         data-adapt-container-width="true"
         data-hide-cover="false"
         data-show-facepile="true">
-        <blockquote cite="https://www.facebook.com/conniecares1990" class="fb-xfbml-parse-ignore">
+         <!--FACEBOOK連結-->
+        <blockquote cite="https://www.facebook.com/conniecares1990" class="fb-xfbml-parse-ignore">  
           <a href="https://www.facebook.com/conniecares1990">康妮泌乳美學</a>
         </blockquote>
       </div>
-      <!-- IG Feed Plugin -->
+      <!--IG連結-->
       <div class="ig-widget-container">
         <iframe src="//lightwidget.com/widgets/dac98d3517105b29a9bd4ea57cae3703.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width:100%;border:0;overflow:hidden;"></iframe>
       </div>
